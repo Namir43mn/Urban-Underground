@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700">
+
+<defs>
+
+<linearGradient id="graffitiFill" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#FF0080"/>
+<stop offset="30%" stop-color="#FF6B00"/>
+<stop offset="60%" stop-color="#00E5FF"/>
+<stop offset="100%" stop-color="#7CFF00"/>
+</linearGradient>
+
+<filter id="shadow">
+<feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.6"/>
+</filter>
+
+</defs>
+
+<!-- Main Paint Explosion -->
+
+<path
+fill="url(#graffitiFill)"
+opacity=".95"
+d="
+M170 360
+C140 210 320 110 470 180
+C520 70 720 90 760 230
+C940 170 1070 330 980 470
+C1060 590 910 700 700 620
+C590 710 360 650 280 520
+C120 510 90 430 170 360Z"/>
+
+<!-- Paint Drips -->
+
+<rect x="350" y="500" width="20" height="110" rx="10" fill="#FF0080"/>
+<circle cx="360" cy="625" r="18" fill="#FF0080"/>
+
+<rect x="530" y="520" width="24" height="130" rx="12" fill="#00E5FF"/>
+<circle cx="542" cy="665" r="20" fill="#00E5FF"/>
+
+<rect x="760" y="510" width="18" height="95" rx="9" fill="#7CFF00"/>
+<circle cx="769" cy="620" r="17" fill="#7CFF00"/>
+
+<!-- Graffiti Text -->
+
+<text
+x="180"
+y="390"
+font-family="Permanent Marker, Arial"
+font-size="130"
+fill="#ffffff"
+stroke="#111"
+stroke-width="10"
+filter="url(#shadow)"
+transform="rotate(-6 180 390)">
+STREET
+</text>
+
+<text
+x="360"
+y="505"
+font-family="Permanent Marker, Arial"
+font-size="110"
+fill="#111"
+stroke="#ffffff"
+stroke-width="8"
+transform="rotate(4 360 505)">
+CHAT
+</text>
+
+<!-- Arrow -->
+
+<path
+fill="#ffffff"
+d="
+M840 140
+L1080 190
+L980 100
+L1160 170
+L980 250
+L1080 160
+L840 210Z"/>
+
+<!-- Crown -->
+
+<path
+fill="#FFD400"
+d="
+M560 95
+L590 145
+L640 90
+L690 145
+L730 95
+L750 180
+L540 180Z"/>
+
+<!-- Lightning -->
+
+<polygon
+fill="#00E5FF"
+points="
+930,320
+990,320
+950,400
+1020,400
+900,540
+940,430
+870,430"/>
+
+<!-- Stars -->
+
+<polygon fill="#fff"
+points="1040,470 1050,495 1080,495 1055,510 1065,540 1040,520 1015,540 1025,510 1000,495 1030,495"/>
+
+<polygon fill="#fff"
+points="170,120 180,145 210,145 185,160 195,190 170,170 145,190 155,160 130,145 160,145"/>
+
+<!-- Spray Dots -->
+
+<g fill="#fff" opacity=".9">
+
+<circle cx="90" cy="250" r="4"/>
+<circle cx="120" cy="230" r="3"/>
+<circle cx="140" cy="270" r="5"/>
+
+<circle cx="1080" cy="310" r="4"/>
+<circle cx="1110" cy="340" r="6"/>
+<circle cx="1050" cy="360" r="3"/>
+
+<circle cx="270" cy="620" r="5"/>
+<circle cx="310" cy="650" r="3"/>
+<circle cx="880" cy="610" r="5"/>
+
+</g>
+
+<!-- Hand Drawn X -->
+
+<g stroke="#fff" stroke-width="8" stroke-linecap="round">
+
+<line x1="1040" y1="90" x2="1080" y2="130"/>
+<line x1="1080" y1="90" x2="1040" y2="130"/>
+
+<line x1="120" y1="560" x2="165" y2="605"/>
+<line x1="165" y1="560" x2="120" y2="605"/>
+
+</g>
+
+</svg>

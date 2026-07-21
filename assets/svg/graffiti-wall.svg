@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+
+<defs>
+
+<linearGradient id="wall" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%" stop-color="#2d2d2d"/>
+<stop offset="100%" stop-color="#111111"/>
+</linearGradient>
+
+<filter id="shadow">
+<feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".55"/>
+</filter>
+
+</defs>
+
+<!-- Wall -->
+
+<rect width="1920" height="1080" fill="url(#wall)"/>
+
+<!-- Concrete Lines -->
+
+<g stroke="#4a4a4a" stroke-width="2" opacity=".35">
+
+<line x1="0" y1="220" x2="1920" y2="220"/>
+<line x1="0" y1="540" x2="1920" y2="540"/>
+<line x1="0" y1="860" x2="1920" y2="860"/>
+
+<line x1="320" y1="0" x2="320" y2="1080"/>
+<line x1="640" y1="0" x2="640" y2="1080"/>
+<line x1="960" y1="0" x2="960" y2="1080"/>
+<line x1="1280" y1="0" x2="1280" y2="1080"/>
+<line x1="1600" y1="0" x2="1600" y2="1080"/>
+
+</g>
+
+<!-- Graffiti 1 -->
+
+<text
+x="120"
+y="220"
+font-size="140"
+font-family="Permanent Marker"
+fill="#00F5FF"
+stroke="#000"
+stroke-width="10"
+filter="url(#shadow)"
+transform="rotate(-8 120 220)">
+STREET
+</text>
+
+<!-- Graffiti 2 -->
+
+<text
+x="620"
+y="340"
+font-size="180"
+font-family="Permanent Marker"
+fill="#FF296D"
+stroke="#111"
+stroke-width="12"
+transform="rotate(6 620 340)">
+CHAOS
+</text>
+
+<!-- Graffiti 3 -->
+
+<text
+x="1180"
+y="760"
+font-size="160"
+font-family="Permanent Marker"
+fill="#7FFF00"
+stroke="#000"
+stroke-width="10"
+transform="rotate(-10 1180 760)">
+CHAT
+</text>
+
+<!-- Graffiti 4 -->
+
+<text
+x="300"
+y="850"
+font-size="120"
+font-family="Permanent Marker"
+fill="#FFD400"
+stroke="#000"
+stroke-width="8"
+transform="rotate(8 300 850)">
+NO RULES
+</text>
+
+<!-- Paint Splash -->
+
+<g opacity=".85">
+
+<circle cx="250" cy="540" r="90" fill="#FF5A00"/>
+<circle cx="210" cy="470" r="35" fill="#FF5A00"/>
+<circle cx="330" cy="470" r="25" fill="#FF5A00"/>
+<circle cx="310" cy="610" r="20" fill="#FF5A00"/>
+
+</g>
+
+<g opacity=".8">
+
+<circle cx="1500" cy="280" r="80" fill="#00D9FF"/>
+<circle cx="1580" cy="220" r="30" fill="#00D9FF"/>
+<circle cx="1430" cy="230" r="18" fill="#00D9FF"/>
+
+</g>
+
+<!-- Drips -->
+
+<g fill="#00F5FF">
+
+<rect x="1450" y="320" width="14" height="120" rx="7"/>
+<circle cx="1457" cy="455" r="12"/>
+
+<rect x="1550" y="300" width="12" height="90" rx="6"/>
+<circle cx="1556" cy="400" r="10"/>
+
+</g>
+
+<!-- Arrows -->
+
+<g fill="#fff">
+
+<path d="M1670 520L1840 480L1775 430L1900 500L1775 570L1840 520L1670 560Z"/>
+
+<path d="M100 980L280 940L220 900L340 960L220 1020L280 980L100 1030Z"/>
+
+</g>
+
+<!-- Crown -->
+
+<path
+fill="#FFD400"
+d="M860 120
+L900 170
+L960 110
+L1020 170
+L1060 120
+L1085 215
+L835 215Z"/>
+
+<!-- Lightning -->
+
+<polygon
+fill="#fff"
+points="
+1660,760
+1710,760
+1680,830
+1750,830
+1640,960
+1675,860
+1615,860"/>
+
+<!-- Stars -->
+
+<g fill="#fff">
+
+<polygon points="1320,120 1332,150 1365,150 1338,170 1350,205 1320,183 1290,205 1302,170 1275,150 1308,150"/>
+
+<polygon points="180,120 192,150 225,150 198,170 210,205 180,183 150,205 162,170 135,150 168,150"/>
+
+</g>
+
+<!-- Spray Dots -->
+
+<g fill="#fff" opacity=".75">
+
+<circle cx="120" cy="300" r="5"/>
+<circle cx="150" cy="320" r="3"/>
+<circle cx="180" cy="340" r="4"/>
+
+<circle cx="1810" cy="620" r="6"/>
+<circle cx="1760" cy="640" r="4"/>
+<circle cx="1710" cy="670" r="3"/>
+
+<circle cx="820" cy="980" r="5"/>
+<circle cx="870" cy="1010" r="3"/>
+
+</g>
+
+<!-- Comic X -->
+
+<g stroke="#fff" stroke-width="8" stroke-linecap="round">
+
+<line x1="1650" y1="120" x2="1695" y2="165"/>
+<line x1="1695" y1="120" x2="1650" y2="165"/>
+
+<line x1="520" y1="640" x2="565" y2="685"/>
+<line x1="565" y1="640" x2="520" y2="685"/>
+
+</g>
+
+</svg>
