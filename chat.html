@@ -16,6 +16,7 @@
         /* ================= CHAT PAGE SPECIFIC STYLES ================= */
         body {
             overflow-x: hidden;
+            background: #050505;
         }
 
         .chat-layout {
@@ -32,18 +33,19 @@
 
         /* Sidebar / Friends List Styling */
         .chat-sidebar {
-            background: rgba(17, 17, 17, 0.9);
+            background: rgba(17, 17, 17, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
-            -webkit-backdrop-filter: blur(16px);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 18px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 0; /* Prevents flex children from overflowing container */
+            transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+            min-height: 0;
+            will-change: transform;
         }
 
         .sidebar-title {
@@ -76,8 +78,16 @@
             gap: 10px;
             overflow-y: auto;
             padding-right: 4px;
-            flex: 1; /* Allows list to stretch and scroll inside drawer */
+            flex: 1;
             min-height: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .empty-friends-msg {
+            color: #666;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 30px;
         }
 
         .friend-item a {
@@ -88,7 +98,7 @@
             border-radius: 16px;
             color: var(--gray, #a5a5a5);
             text-decoration: none;
-            transition: all 0.25s ease;
+            transition: background 0.2s ease, color 0.2s ease;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid transparent;
         }
@@ -127,7 +137,6 @@
 
         .status-indicator.online {
             background: var(--green, #5CFF72);
-            box-shadow: 0 0 8px var(--green, #5CFF72);
         }
 
         .status-indicator.offline {
@@ -160,16 +169,11 @@
         .sidebar-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
-            -webkit-backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
             z-index: 99;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease;
         }
 
         .sidebar-overlay.visible {
@@ -194,11 +198,11 @@
 
         /* Chat Main Box */
         .chat-container {
-            background: rgba(10, 10, 10, 0.85);
+            background: rgba(10, 10, 10, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
-            -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -249,6 +253,15 @@
             flex-direction: column;
             gap: 14px;
             scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .empty-chat-msg {
+            margin: auto;
+            color: #555;
+            font-size: 0.9rem;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
         }
 
         .msg-group {
@@ -293,13 +306,12 @@
             color: #000;
             font-weight: 600;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 0 15px rgba(92, 255, 114, 0.2);
         }
 
         /* Message Input Area */
         .chat-input-area {
             padding: 14px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             gap: 10px;
@@ -314,14 +326,12 @@
             border-radius: 50px;
             color: #fff;
             font-family: 'Outfit', sans-serif;
-            font-size: 16px; /* 16px stops iOS auto-zoom on touch focus */
+            font-size: 16px;
             outline: none;
-            transition: all 0.3s ease;
         }
 
         .chat-input-area input:focus {
             border-color: var(--green, #5CFF72);
-            box-shadow: 0 0 12px rgba(92, 255, 114, 0.2);
         }
 
         .send-btn {
@@ -334,8 +344,6 @@
             font-family: 'Outfit', sans-serif;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 12px rgba(92, 255, 114, 0.3);
             white-space: nowrap;
         }
 
@@ -343,12 +351,25 @@
             transform: scale(0.96);
         }
 
-        /* Responsive Breakpoints for Mobile */
+        /* ================= LOW-END DEVICE & MOBILE OPTIMIZATIONS ================= */
         @media (max-width: 850px) {
+            .chat-sidebar, 
+            .chat-container, 
+            .sidebar-overlay {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+
+            .corner-graffiti,
+            .bottom-graffiti,
+            .smoke {
+                display: none !important;
+            }
+
             .chat-layout {
                 grid-template-columns: 1fr;
-                height: calc(100dvh - 90px);
-                margin: 75px auto 10px auto;
+                height: calc(100dvh - 80px);
+                margin: 70px auto 10px auto;
                 width: 96%;
             }
 
@@ -364,34 +385,44 @@
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 290px;
+                width: 280px;
                 height: 100dvh;
-                border-radius: 0 24px 24px 0;
+                border-radius: 0 20px 20px 0;
                 z-index: 100;
-                transform: translateX(-100%);
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
-                padding-top: 25px;
-                padding-bottom: 25px;
+                transform: translate3d(-100%, 0, 0);
+                box-shadow: 5px 0 20px rgba(0, 0, 0, 0.8);
+                padding-top: 20px;
+                padding-bottom: 20px;
+                background: #111111;
             }
 
             .chat-sidebar.open {
-                transform: translateX(0);
+                transform: translate3d(0, 0, 0);
             }
 
             .chat-container {
                 height: 100%;
-                border-radius: 20px;
+                border-radius: 18px;
+                background: #0d0d0d;
             }
 
             .msg-group {
-                max-width: 88%;
+                max-width: 90%;
+            }
+
+            .chat-header {
+                padding: 10px 14px;
+            }
+
+            .chat-input-area {
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Background Noise & Visuals -->
+    <!-- Visual Background Overlays -->
     <div class="noise"></div>
     <div class="smoke smoke1"></div>
     <div class="smoke smoke2"></div>
@@ -432,60 +463,8 @@
                 <span>CREW CHATS</span>
                 <button class="close-sidebar-btn" id="closeSidebar">✕</button>
             </div>
-            <ul class="friends-list">
-                
-                <li class="friend-item active">
-                    <a href="#" data-friend="ShadowPainter">
-                        <div class="friend-avatar-wrapper">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ShadowPainter" alt="ShadowPainter" class="friend-avatar">
-                            <span class="status-indicator online"></span>
-                        </div>
-                        <div class="friend-info">
-                            <span class="friend-name">ShadowPainter</span>
-                            <span class="friend-status-text">Online</span>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="friend-item">
-                    <a href="#" data-friend="VandalX">
-                        <div class="friend-avatar-wrapper">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=VandalX" alt="VandalX" class="friend-avatar">
-                            <span class="status-indicator online"></span>
-                        </div>
-                        <div class="friend-info">
-                            <span class="friend-name">VandalX</span>
-                            <span class="friend-status-text">Ready to spray...</span>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="friend-item">
-                    <a href="#" data-friend="NeonGhost">
-                        <div class="friend-avatar-wrapper">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=NeonGhost" alt="NeonGhost" class="friend-avatar">
-                            <span class="status-indicator offline"></span>
-                        </div>
-                        <div class="friend-info">
-                            <span class="friend-name">NeonGhost</span>
-                            <span class="friend-status-text">Offline</span>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="friend-item">
-                    <a href="#" data-friend="CyberTag">
-                        <div class="friend-avatar-wrapper">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=CyberTag" alt="CyberTag" class="friend-avatar">
-                            <span class="status-indicator online"></span>
-                        </div>
-                        <div class="friend-info">
-                            <span class="friend-name">CyberTag</span>
-                            <span class="friend-status-text">Online</span>
-                        </div>
-                    </a>
-                </li>
-
+            <ul class="friends-list" id="friendsList">
+                <p class="empty-friends-msg" id="emptyFriendsMsg">No crew active yet...</p>
             </ul>
         </aside>
 
@@ -495,14 +474,14 @@
             <div class="chat-header">
                 <h2>
                     <button class="mobile-channels-toggle" id="toggleSidebar">👥 Crew</button>
-                    <span id="activeChatName">ShadowPainter</span> <span>[Private Wall]</span>
+                    <span id="activeChatName">Select a Crew</span> <span>[Tunnel Wall]</span>
                 </h2>
-                <div class="online-tag" id="activeStatusTag">● Online</div>
+                <div class="online-tag" id="activeStatusTag">● Ready</div>
             </div>
 
             <!-- Scrollable Messages Area -->
             <div class="chat-messages" id="chatMessages">
-                <!-- Messages will appear here dynamically -->
+                <div class="empty-chat-msg" id="emptyChatMsg">Start spraying your message below...</div>
             </div>
 
             <!-- Input Bar -->
@@ -525,8 +504,7 @@
         const chatForm = document.getElementById('chatForm');
         const msgInput = document.getElementById('msgInput');
         const chatMessages = document.getElementById('chatMessages');
-        const activeChatName = document.getElementById('activeChatName');
-        const activeStatusTag = document.getElementById('activeStatusTag');
+        const emptyChatMsg = document.getElementById('emptyChatMsg');
         
         // Mobile Sidebar elements
         const toggleSidebar = document.getElementById('toggleSidebar');
@@ -534,7 +512,7 @@
         const chatSidebar = document.getElementById('chatSidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-        // Functions to Open/Close Mobile Friends Drawer
+        // Drawer Controls
         function openFriendsDrawer() {
             chatSidebar.classList.add('open');
             sidebarOverlay.classList.add('visible');
@@ -549,36 +527,17 @@
         if (closeSidebar) closeSidebar.addEventListener('click', closeFriendsDrawer);
         if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeFriendsDrawer);
 
-        // Friends Selection Handler
-        const friendItems = document.querySelectorAll('.friend-item');
-        friendItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                friendItems.forEach(f => f.classList.remove('active'));
-                item.classList.add('active');
-
-                const name = item.querySelector('.friend-name').textContent;
-                const isOnline = item.querySelector('.status-indicator').classList.contains('online');
-
-                activeChatName.textContent = name;
-                activeStatusTag.textContent = isOnline ? '● Online' : '○ Offline';
-                activeStatusTag.style.color = isOnline ? 'var(--green, #5CFF72)' : '#888';
-                activeStatusTag.style.borderColor = isOnline ? 'rgba(92, 255, 114, 0.3)' : 'rgba(255, 255, 255, 0.1)';
-
-                // Clear chat room messages when switching friends
-                chatMessages.innerHTML = '';
-
-                // Close mobile drawer upon selecting a friend
-                closeFriendsDrawer();
-            });
-        });
-
-        // Send message handler
+        // Message submit handler
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = msgInput.value.trim();
             
             if (text) {
+                // Remove empty placeholder message if present
+                if (emptyChatMsg && emptyChatMsg.parentNode) {
+                    emptyChatMsg.remove();
+                }
+
                 const now = new Date();
                 const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -592,11 +551,8 @@
                 chatMessages.appendChild(msgGroup);
                 msgInput.value = '';
                 
-                // Scroll smooth to bottom on new message
-                chatMessages.scrollTo({
-                    top: chatMessages.scrollHeight,
-                    behavior: 'smooth'
-                });
+                // Fast scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         });
 
