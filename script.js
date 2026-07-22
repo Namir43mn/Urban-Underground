@@ -3,9 +3,57 @@
 ========================================*/
 
 window.addEventListener("load", () => {
-    
     document.body.classList.add("loaded");
-    
+
+    const overlay = document.getElementById('loginOverlay');
+    const loginForm = document.getElementById('loginForm');
+    const loginClose = document.getElementById('loginClose');
+    const exploreBtn = document.getElementById('exploreBtn');
+    const usernameInput = document.getElementById('username');
+
+    function showLogin(){
+        overlay.classList.add('visible');
+        overlay.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => usernameInput && usernameInput.focus(), 150);
+    }
+
+    function hideLogin(){
+        overlay.classList.remove('visible');
+        overlay.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+    }
+
+    // Show on first load
+    showLogin();
+
+    // Close handlers
+    loginClose && loginClose.addEventListener('click', hideLogin);
+    exploreBtn && exploreBtn.addEventListener('click', hideLogin);
+
+    // Header links to open login
+    document.querySelectorAll('.login, .join').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    });
+
+    // Hero primary that should enter tunnel (open login)
+    document.querySelectorAll('.hero .primary-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    });
+
+    // Form submit - simple demo behaviour
+    loginForm && loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // simulate login; in a real app you'd validate / call API
+        hideLogin();
+    });
+
 });
 
 /*========================================
