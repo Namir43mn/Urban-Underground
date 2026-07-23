@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Underground Chat</title>
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-container {
+            max-width: 480px;
+            margin: 110px auto 50px auto;
+            padding: 35px 28px;
+            background: #111111;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(92, 255, 114, 0.15);
+            position: relative;
+            z-index: 10;
+        }
+
+        .form-container h1 {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 2.2rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .form-container h1 span {
+            color: var(--green, #5CFF72);
+        }
+
+        .form-container p {
+            color: #a5a5a5;
+            text-align: center;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            color: #ddd;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="email"],
+        .input-group input[type="tel"] {
+            width: 100%;
+            background: #181818;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--green, #5CFF72);
+        }
+
+        .photo-upload-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #1e1e1e;
+            border: 2px dashed var(--green, #5CFF72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .photo-preview span {
+            font-size: 0.75rem;
+            color: #a5a5a5;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        .upload-btn-label {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-btn-label:hover {
+            background: var(--green, #5CFF72);
+            color: #000;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--green, #5CFF72);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(92, 255, 114, 0.3);
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(92, 255, 114, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                UNDERGROUND
+                <span>CHAT</span>
+            </a>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="id.html">My ID</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h1>COMPLETE <span>PROFILE</span></h1>
+        <p>Set up your underground identity details</p>
+
+        <form id="createAccountForm">
+            <div class="photo-upload-wrapper">
+                <div class="photo-preview" id="photoPreviewContainer" onclick="document.getElementById('photoInput').click()">
+                    <span id="previewPlaceholder">Click to upload photo</span>
+                    <img id="imagePreview" alt="Profile Preview">
+                </div>
+                <label for="photoInput" class="upload-btn-label">Choose JPG / PNG</label>
+                <input type="file" id="photoInput" accept="image/jpeg, image/png">
+            </div>
+
+            <div class="input-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="e.g. Alex Mercer" required>
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="alex@university.edu" required>
+            </div>
+
+            <div class="input-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="+880 1700 000000" required>
+            </div>
+
+            <div class="input-group">
+                <label for="versityId">Versity ID No.</label>
+                <input type="text" id="versityId" placeholder="e.g. 26206037" required>
+            </div>
+
+            <button type="submit" id="submitBtn" class="submit-btn">GENERATE ID CARD</button>
+        </form>
+    </main>
+
+    <!-- FIREBASE SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let uploadedPhotoBase64 = "";
+        const photoInput = document.getElementById('photoInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedPhotoBase64 = event.target.result;
+                    imagePreview.src = uploadedPhotoBase64;
+                    imagePreview.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = "SAVING TO CLOUD...";
+            submitBtn.disabled = true;
+
+            const versityId = document.getElementById('versityId').value.trim();
+            const profileData = {
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                versityId: versityId,
+                photo: uploadedPhotoBase64 || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
+            };
+
+            try {
+                // Save profile to Cloud Firestore database
+                await setDoc(doc(db, "users", versityId), profileData);
+                // Save user ID to localStorage session
+                localStorage.setItem('ug_current_user_id', versityId);
+                window.location.href = 'id.html';
+            } 
+            
+            catch (error) {
+    console.error("Firebase Error:", error);
+    alert("Error: " + error.message);
+}
+
+
+submitBtn.textContent = "GENERATE ID CARD";
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

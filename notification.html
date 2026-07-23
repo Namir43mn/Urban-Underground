@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts & Tunnel Signals - Underground Chat</title>
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ================= FX LAYERS ================= */
+        #mouse-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(92, 255, 114, 0.12) 0%, rgba(255, 122, 0, 0.04) 45%, transparent 70%);
+            pointer-events: none;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            transition: transform 0.04s linear;
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .ambient-smoke {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.3;
+            background: url('assets/svg/smoke.svg') center/cover no-repeat;
+            animation: smokeMove 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes smokeMove {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(-30px, 20px); }
+        }
+
+        /* ================= NOTIFICATIONS CONTAINER ================= */
+        .notif-container {
+            max-width: 800px;
+            margin: 120px auto 60px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .section-header h1 {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 2.8rem;
+            color: #fff;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .section-header h1 span {
+            color: var(--green, #5CFF72);
+        }
+
+        .mark-read-btn {
+            background: rgba(92, 255, 114, 0.1);
+            color: var(--green, #5CFF72);
+            border: 1px solid rgba(92, 255, 114, 0.3);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mark-read-btn:hover {
+            background: var(--green, #5CFF72);
+            color: #050505;
+            box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
+        }
+
+        /* Tabs Filter */
+        .notif-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .notif-tab {
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notif-tab.active, .notif-tab:hover {
+            color: #fff;
+            border-color: rgba(92, 255, 114, 0.4);
+        }
+
+        .notif-tab.active {
+            background: rgba(92, 255, 114, 0.15);
+            color: var(--green, #5CFF72);
+            border-color: var(--green, #5CFF72);
+        }
+
+        /* Notification List */
+        .notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notif-card {
+            background: #121212;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .notif-card.unread {
+            border-left: 4px solid var(--green, #5CFF72);
+            background: #161616;
+        }
+
+        .notif-card:hover {
+            transform: translateX(4px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .notif-icon-box {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notif-content {
+            flex: 1;
+        }
+
+        .notif-title {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+
+        .notif-desc {
+            color: #a5a5a5;
+            font-size: 0.9rem;
+            margin: 0 0 10px 0;
+            line-height: 1.4;
+        }
+
+        .notif-time {
+            color: #666;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .notif-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-notif {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-notif-primary {
+            background: var(--green, #5CFF72);
+            color: #050505;
+        }
+
+        .btn-notif-primary:hover {
+            background: #4ae660;
+            box-shadow: 0 0 10px rgba(92, 255, 114, 0.3);
+        }
+
+        .btn-notif-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ccc;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-notif-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .dismiss-btn {
+            background: transparent;
+            border: none;
+            color: #555;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+
+        .dismiss-btn:hover {
+            color: #ff4d4d;
+        }
+
+        .empty-notif {
+            text-align: center;
+            color: #666;
+            padding: 60px 0;
+            font-size: 1.1rem;
+        }
+
+        /* Toast Popup */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: #fff;
+            border: 1px solid var(--green, #5CFF72);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            font-weight: 600;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background FX -->
+    <div id="mouse-glow"></div>
+    <canvas id="particles-canvas"></canvas>
+    <div class="ambient-smoke"></div>
+
+    <!-- Noise Overlay -->
+    <div class="noise"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                UNDERGROUND
+                <span>CHAT</span>
+            </a>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="friends.html">Crew</a></li>
+                <li><a href="notification.html" style="color: var(--green, #5CFF72);">Alerts</a></li>
+                <li><a href="id.html">My ID</a></li>
+            </ul>
+            <div class="nav-btn">
+                <a href="chat.html" class="join">Enter Tunnel</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="notif-container">
+        <div class="section-header">
+            <div>
+                <h1>TUNNEL <span>ALERTS</span></h1>
+            </div>
+            <button class="mark-read-btn" id="markAllReadBtn">Clear All Signals</button>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="notif-tabs">
+            <button class="notif-tab active" data-filter="all">All Alerts</button>
+            <button class="notif-tab" data-filter="unread">Unread</button>
+            <button class="notif-tab" data-filter="crew">Crew Invites</button>
+        </div>
+
+        <!-- Notification List -->
+        <div class="notif-list" id="notifList">
+            <!-- Dynamic notifications injected here -->
+        </div>
+    </div>
+
+    <!-- Toast Popup -->
+    <div class="toast" id="toast">Action Complete! ⚡</div>
+
+    <!-- FIREBASE SDK & REALTIME LISTENER -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const currentUserId = localStorage.getItem("ug_current_user_id");
+        const notifList = document.getElementById("notifList");
+        const markAllReadBtn = document.getElementById("markAllReadBtn");
+        const toast = document.getElementById("toast");
+
+        let notifications = [];
+        let activeFilter = "all";
+
+        // Mock baseline notifications if Firestore is empty
+        const mockNotifs = [
+            {
+                id: "mock1",
+                type: "crew",
+                icon: "👥",
+                title: "Crew Invite Received",
+                desc: "ToxicSpray wants you to join 'Tunnel Zero Crew'.",
+                time: "5 mins ago",
+                unread: true,
+                actions: true
+            },
+            {
+                id: "mock2",
+                type: "poke",
+                icon: "👈",
+                title: "You've been poked!",
+                desc: "NeonVandal sent you a street signal.",
+                time: "1 hour ago",
+                unread: true,
+                actions: false
+            },
+            {
+                id: "mock3",
+                type: "chat",
+                icon: "💬",
+                title: "New Message in Wall",
+                desc: "AcidBurn left a tag on your wall board.",
+                time: "3 hours ago",
+                unread: false,
+                actions: false
+            }
+        ];
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+        }
+
+        function renderNotifications() {
+            notifList.innerHTML = "";
+
+            const filtered = notifications.filter(n => {
+                if (activeFilter === "unread") return n.unread;
+                if (activeFilter === "crew") return n.type === "crew";
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                notifList.innerHTML = `<div class="empty-notif">No tunnel alerts at the moment. You're clear! 🟢</div>`;
+                return;
+            }
+
+            filtered.forEach(notif => {
+                const card = document.createElement("div");
+                card.className = `notif-card ${notif.unread ? 'unread' : ''}`;
+
+                card.innerHTML = `
+                    <div class="notif-icon-box">${notif.icon}</div>
+                    <div class="notif-content">
+                        <h3 class="notif-title">${notif.title}</h3>
+                        <p class="notif-desc">${notif.desc}</p>
+                        <span class="notif-time">${notif.time}</span>
+                        ${notif.actions ? `
+                            <div class="notif-actions">
+                                <button class="btn-notif btn-notif-primary accept-btn" data-id="${notif.id}">Accept Crew</button>
+                                <button class="btn-notif btn-notif-secondary decline-btn" data-id="${notif.id}">Decline</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <button class="dismiss-btn" data-id="${notif.id}" title="Dismiss">&times;</button>
+                `;
+
+                notifList.appendChild(card);
+            });
+
+            // Action Listeners
+            document.querySelectorAll(".dismiss-btn").forEach(btn => {
+                btn.addEventListener("click", () => dismissNotification(btn.dataset.id));
+            });
+
+            document.querySelectorAll(".accept-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    showToast("🎉 Crew invite accepted!");
+                    dismissNotification(btn.dataset.id);
+                });
+            });
+
+            document.querySelectorAll(".decline-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    showToast("Invite declined.");
+                    dismissNotification(btn.dataset.id);
+                });
+            });
+        }
+
+        async function dismissNotification(id) {
+            notifications = notifications.filter(n => n.id !== id);
+            renderNotifications();
+            showToast("Alert cleared");
+
+            // Delete from Firestore if authenticated
+            if (currentUserId && !id.startsWith("mock")) {
+                try {
+                    await deleteDoc(doc(db, "notifications", id));
+                } catch (e) {
+                    console.error("Firestore error deleting notification:", e);
+                }
+            }
+        }
+
+        // Listen for Realtime Notifications in Firebase
+        if (currentUserId) {
+            const q = query(collection(db, "notifications"), where("userId", "==", currentUserId));
+            onSnapshot(q, (snapshot) => {
+                const liveNotifs = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    liveNotifs.push({
+                        id: docSnap.id,
+                        type: data.type || "general",
+                        icon: data.icon || "🔔",
+                        title: data.title || "Notification",
+                        desc: data.message || "",
+                        time: "Just now",
+                        unread: data.unread ?? true,
+                        actions: data.type === "crew"
+                    });
+                });
+
+                notifications = liveNotifs.length > 0 ? liveNotifs : mockNotifs;
+                renderNotifications();
+            });
+        } else {
+            notifications = mockNotifs;
+            renderNotifications();
+        }
+
+        // Filter Tab Handlers
+        document.querySelectorAll(".notif-tab").forEach(tab => {
+            tab.addEventListener("click", () => {
+                document.querySelectorAll(".notif-tab").forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                activeFilter = tab.dataset.filter;
+                renderNotifications();
+            });
+        });
+
+        // Mark All Read Handler
+        markAllReadBtn.addEventListener("click", () => {
+            notifications.forEach(n => n.unread = false);
+            renderNotifications();
+            showToast("All signals marked as read.");
+        });
+    </script>
+
+    <!-- UI ANIMATIONS & CANVAS SCRIPT -->
+    <script>
+        // --- MOUSE GLOW ---
+        const glow = document.getElementById('mouse-glow');
+        window.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // --- PARTICLES CANVAS ---
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
+                this.opacity = Math.random() * 0.6 + 0.2;
+                this.color = Math.random() > 0.5 ? '#5CFF72' : '#FF7A00';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+</body>
+</html>

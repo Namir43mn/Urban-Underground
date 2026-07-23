@@ -204,6 +204,13 @@
             font-size: 1.4rem;
             color: var(--green, #5CFF72);
             border: 2px solid rgba(92, 255, 114, 0.3);
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .status-dot {
@@ -340,7 +347,8 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="chat.html">Chat</a></li>
                 <li><a href="friends.html" style="color: var(--green, #5CFF72);">Crew</a></li>
-                <li><a href="#">Settings</a></li>
+                <li><a href="notification.html">Alerts</a></li>
+                <li><a href="id.html">My ID</a></li>
             </ul>
             <div class="nav-btn">
                 <a href="chat.html" class="join">Enter Tunnel</a>
@@ -365,7 +373,7 @@
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" id="tabFriends">My Friends (<span id="friendCount">3</span>)</button>
+            <button class="tab-btn active" id="tabFriends">My Friends (<span id="friendCount">0</span>)</button>
             <button class="tab-btn" id="tabSearch">Discover Taggers</button>
         </div>
 
@@ -376,20 +384,31 @@
     </div>
 
     <!-- Toast Popup -->
-    <div class="toast" id="toast">You poked ToxicSpray! 👈</div>
+    <div class="toast" id="toast">Signal Sent! 👈</div>
 
-    <script>
-        // Mock User Database
-        const usersDatabase = [
-            { id: "1092", username: "ToxicSpray", isFriend: true, online: true, initials: "TS" },
-            { id: "4040", username: "NeonVandal", isFriend: true, online: true, initials: "NV" },
-            { id: "8821", username: "GhostRider", isFriend: true, online: false, initials: "GR" },
-            { id: "3055", username: "ShadowQueen", isFriend: false, online: true, initials: "SQ" },
-            { id: "9912", username: "AcidBurn", isFriend: false, online: false, initials: "AB" },
-            { id: "5541", username: "BrickBreaker", isFriend: false, online: true, initials: "BB" }
-        ];
+    <!-- FIREBASE MODULE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let usersDatabase = [];
+        let friendIds = new Set();
         let currentTab = "friends";
+
+        const currentUserId = localStorage.getItem("ug_current_user_id");
         const userGrid = document.getElementById("userGrid");
         const searchInput = document.getElementById("searchInput");
         const tabFriends = document.getElementById("tabFriends");
@@ -402,12 +421,47 @@
             setTimeout(() => toast.classList.remove("show"), 2500);
         }
 
+        async function fetchFriendsAndUsers() {
+            try {
+                // 1. Fetch current user's friends list
+                if (currentUserId) {
+                    const friendsSnap = await getDocs(query(collection(db, "friends"), where("userId", "==", currentUserId)));
+                    friendsSnap.forEach(docSnap => {
+                        friendIds.add(docSnap.data().friendId);
+                    });
+                }
+
+                // 2. Fetch all users from Firestore
+                const usersSnap = await getDocs(collection(db, "users"));
+                usersDatabase = [];
+
+                usersSnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (docSnap.id !== currentUserId) { // Exclude current logged in user
+                        usersDatabase.push({
+                            id: docSnap.id,
+                            versityId: data.versityId || "0000",
+                            username: data.fullName || "Anonymous Tagger",
+                            photo: data.photo || "",
+                            isFriend: friendIds.has(docSnap.id),
+                            online: true,
+                            initials: data.fullName ? data.fullName.split(" ").map(n => n[0]).join("").toUpperCase() : "UG"
+                        });
+                    }
+                });
+
+                renderUsers();
+            } catch (err) {
+                console.error("Error loading users from Firebase:", err);
+            }
+        }
+
         function renderUsers() {
-            const query = searchInput.value.toLowerCase().trim();
+            const queryVal = searchInput.value.toLowerCase().trim();
             userGrid.innerHTML = "";
 
             const filtered = usersDatabase.filter(user => {
-                const matchesSearch = user.username.toLowerCase().includes(query) || user.id.includes(query);
+                const matchesSearch = user.username.toLowerCase().includes(queryVal) || user.versityId.includes(queryVal);
                 if (currentTab === "friends") {
                     return user.isFriend && matchesSearch;
                 } else {
@@ -428,15 +482,19 @@
                 const card = document.createElement("div");
                 card.className = "user-card";
                 
+                const avatarContent = user.photo 
+                    ? `<img src="${user.photo}" alt="${user.username}">` 
+                    : user.initials;
+
                 card.innerHTML = `
                     <div class="user-info">
                         <div class="avatar-container">
-                            <div class="avatar">${user.initials}</div>
+                            <div class="avatar">${avatarContent}</div>
                             <div class="status-dot ${user.online ? 'online' : 'offline'}"></div>
                         </div>
                         <div class="details">
                             <h3>${user.username}</h3>
-                            <span>ID: #${user.id}</span>
+                            <span>ID: #${user.versityId}</span>
                         </div>
                     </div>
                     <div class="card-actions">
@@ -444,11 +502,11 @@
                             <a href="chat.html?user=${encodeURIComponent(user.username)}" class="btn-action btn-chat">
                                 💬 Chat
                             </a>
-                            <button class="btn-action btn-poke" onclick="pokeUser('${user.username}')">
+                            <button class="btn-action btn-poke" data-name="${user.username}">
                                 👈 Poke
                             </button>
                         ` : `
-                            <button class="btn-action btn-add ${user.isFriend ? 'added' : ''}" onclick="addFriend('${user.id}')">
+                            <button class="btn-action btn-add" data-id="${user.id}" data-name="${user.username}">
                                 ➕ Add Friend
                             </button>
                         `}
@@ -456,18 +514,47 @@
                 `;
                 userGrid.appendChild(card);
             });
+
+            // Attach dynamic event handlers
+            document.querySelectorAll(".btn-poke").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const name = btn.getAttribute("data-name");
+                    showToast(`👉 You poked ${name}! They received your signal.`);
+                });
+            });
+
+            document.querySelectorAll(".btn-add").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const id = btn.getAttribute("data-id");
+                    const name = btn.getAttribute("data-name");
+                    await addFriend(id, name);
+                });
+            });
         }
 
-        function pokeUser(username) {
-            showToast(`👉 You poked ${username}! They received your signal.`);
-        }
+        async function addFriend(friendId, friendName) {
+            if (!currentUserId) {
+                showToast("⚠️ Please log in to add friends.");
+                return;
+            }
 
-        function addFriend(id) {
-            const user = usersDatabase.find(u => u.id === id);
-            if (user) {
-                user.isFriend = true;
-                showToast(`🎉 Added ${user.username} to your crew!`);
+            try {
+                const friendDocRef = doc(db, "friends", `${currentUserId}_${friendId}`);
+                await setDoc(friendDocRef, {
+                    userId: currentUserId,
+                    friendId: friendId,
+                    addedAt: new Date()
+                });
+
+                friendIds.add(friendId);
+                const targetUser = usersDatabase.find(u => u.id === friendId);
+                if (targetUser) targetUser.isFriend = true;
+
+                showToast(`🎉 Added ${friendName} to your crew!`);
                 renderUsers();
+            } catch (e) {
+                console.error("Error adding friend: ", e);
+                showToast("❌ Could not add friend. Try again.");
             }
         }
 
@@ -488,9 +575,12 @@
 
         searchInput.addEventListener("input", renderUsers);
 
-        // Initial Render
-        renderUsers();
+        // Initial Fetch
+        fetchFriendsAndUsers();
+    </script>
 
+    <!-- UI ANIMATIONS & CANVAS SCRIPT -->
+    <script>
         // --- MOUSE GLOW ---
         const glow = document.getElementById('mouse-glow');
         window.addEventListener('mousemove', (e) => {
