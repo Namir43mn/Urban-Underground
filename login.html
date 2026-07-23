@@ -225,19 +225,7 @@
     </a>
     <p class="subtitle">Enter your ID credentials to unlock the tunnel</p>
 
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="user-email">Gmail / ID</label>
-        <input type="email" id="user-email" placeholder="tagger@gmail.com" autocomplete="username" required>
-      </div>
-
-      <div class="form-group">
-        <label for="user-password">Password</label>
-        <input type="password" id="user-password" placeholder="••••••••" autocomplete="current-password" required>
-      </div>
-
-      <button type="submit" class="btn-submit">Login</button>
-    </form>
+    
 
     <div class="divider">
       <span>OR DIRECT</span>
@@ -319,7 +307,29 @@
     
   </script>
 <script type="module">
-  const googleLoginBtn = document.getElementById("googleLoginBtn");
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+    authDomain: "urbannoir-13ce8.firebaseapp.com",
+    projectId: "urbannoir-13ce8",
+    storageBucket: "urbannoir-13ce8.firebasestorage.app",
+    messagingSenderId: "1059246827383",
+    appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+    measurementId: "G-CEPWKZXQVF"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const googleLoginBtn = document.getElementById("googleLoginBtn");
 
 googleLoginBtn.addEventListener("click", async () => {
     try {
@@ -329,12 +339,12 @@ googleLoginBtn.addEventListener("click", async () => {
         localStorage.setItem("ug_current_user_id", user.uid);
 
         window.location.href = "createaccount.html";
-
     } catch (error) {
         console.error(error);
         alert(error.message);
     }
 });
+</script>
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 

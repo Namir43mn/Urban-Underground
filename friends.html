@@ -389,7 +389,19 @@
     <!-- FIREBASE MODULE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    addDoc,
+    serverTimestamp,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth,
+     onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -403,12 +415,15 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+let currentUserId = null;
 
         let usersDatabase = [];
         let friendIds = new Set();
         let currentTab = "friends";
 
-        const currentUserId = localStorage.getItem("ug_current_user_id");
+      
         const userGrid = document.getElementById("userGrid");
         const searchInput = document.getElementById("searchInput");
         const tabFriends = document.getElementById("tabFriends");
@@ -422,6 +437,7 @@
         }
 
         async function fetchFriendsAndUsers() {
+            if (!currentUserId) return;
             try {
                 // 1. Fetch current user's friends list
                 if (currentUserId) {
@@ -532,31 +548,49 @@
             });
         }
 
-        async function addFriend(friendId, friendName) {
-            if (!currentUserId) {
-                showToast("⚠️ Please log in to add friends.");
-                return;
-            }
+       async function addFriend(friendId, friendName) {
 
-            try {
-                const friendDocRef = doc(db, "friends", `${currentUserId}_${friendId}`);
-                await setDoc(friendDocRef, {
-                    userId: currentUserId,
-                    friendId: friendId,
-                    addedAt: new Date()
-                });
+    if (!currentUserId) {
+        showToast("Please login first.");
+        return;
+    }
+     if (currentUserId === friendId) {
+        showToast("You can't add yourself.");
+        return;
+    }
 
-                friendIds.add(friendId);
-                const targetUser = usersDatabase.find(u => u.id === friendId);
-                if (targetUser) targetUser.isFriend = true;
+    try {
+   // Check if request already exists
+        const q = query(
+            collection(db, "friendRequests"),
+            where("fromUid", "==", currentUserId),
+            where("toUid", "==", friendId)
+        );
 
-                showToast(`🎉 Added ${friendName} to your crew!`);
-                renderUsers();
-            } catch (e) {
-                console.error("Error adding friend: ", e);
-                showToast("❌ Could not add friend. Try again.");
-            }
+        const existing = await getDocs(q);
+
+        if (!existing.empty) {
+            showToast("Friend request already sent.");
+            return;
         }
+
+        await addDoc(collection(db, "friendRequests"), {
+            fromUid: currentUserId,
+            toUid: friendId,
+            status: "pending",
+            createdAt: serverTimestamp()
+        });
+
+        showToast("Friend request sent.");
+
+    } catch (error) {
+
+        console.error(error);
+        showToast("Failed to send request.");
+
+    }
+
+}
 
         // Tabs Toggle
         tabFriends.addEventListener("click", () => {
@@ -576,7 +610,18 @@
         searchInput.addEventListener("input", renderUsers);
 
         // Initial Fetch
-        fetchFriendsAndUsers();
+      onAuthStateChanged(auth, (user) => {
+
+    if (!user) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    currentUserId = user.uid;
+
+    fetchFriendsAndUsers();
+
+});
     </script>
 
     <!-- UI ANIMATIONS & CANVAS SCRIPT -->

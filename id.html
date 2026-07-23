@@ -228,49 +228,58 @@
     </div>
 
     <!-- FIREBASE SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+   <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-            authDomain: "urbannoir-13ce8.firebaseapp.com",
-            projectId: "urbannoir-13ce8",
-            storageBucket: "urbannoir-13ce8.firebasestorage.app",
-            messagingSenderId: "1059246827383",
-            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
-            measurementId: "G-CEPWKZXQVF"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+    authDomain: "urbannoir-13ce8.firebaseapp.com",
+    projectId: "urbannoir-13ce8",
+    storageBucket: "urbannoir-13ce8.firebasestorage.app",
+    messagingSenderId: "1059246827383",
+    appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+    measurementId: "G-CEPWKZXQVF"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-        const currentUserId = localStorage.getItem('ug_current_user_id');
+onAuthStateChanged(auth, async (user) => {
 
-        if (!currentUserId) {
-            window.location.href = 'createaccount.html';
+    console.log("Firebase User:", user);
+
+    if (!user) {
+        alert("Please login first.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            document.getElementById("displayName").textContent = data.fullName || "N/A";
+            document.getElementById("displayVersityId").textContent = data.versityId || "N/A";
+            document.getElementById("displayEmail").textContent = data.email || "N/A";
+            document.getElementById("displayPhone").textContent = data.phone || "N/A";
+            document.getElementById("displayPhoto").src = data.photo || "";
         } else {
-            async function fetchProfile() {
-                try {
-                    const docRef = doc(db, "users", currentUserId);
-                    const docSnap = await getDoc(docRef);
-
-                    if (docSnap.exists()) {
-                        const user = docSnap.data();
-                        document.getElementById('displayName').textContent = user.fullName || 'N/A';
-                        document.getElementById('displayVersityId').textContent = user.versityId || 'N/A';
-                        document.getElementById('displayEmail').textContent = user.email || 'N/A';
-                        document.getElementById('displayPhone').textContent = user.phone || 'N/A';
-                        document.getElementById('displayPhoto').src = user.photo;
-                    } else {
-                        window.location.href = 'createaccount.html';
-                    }
-                } catch (e) {
-                    console.error("Error loading user profile: ", e);
-                }
-            }
-            fetchProfile();
+            alert("Profile not found.");
+            window.location.href = "createaccount.html";
         }
-    </script>
+
+    } catch (e) {
+        console.error(e);
+        alert(e.message);
+    }
+
+});
+</script>
 </body>
 </html>

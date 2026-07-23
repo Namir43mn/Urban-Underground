@@ -176,6 +176,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, addDoc, doc, getDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
             authDomain: "urbannoir-13ce8.firebaseapp.com",
@@ -189,7 +194,18 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+    console.log("Auth User:", user);
+});
+
      const currentUserId = localStorage.getItem("ug_current_user_id");
+
+     console.log("LocalStorage ID:", currentUserId);
+console.log("Firebase UID:", auth.currentUser?.uid);
+
+
 let currentUserProfile = null;
 
 async function loadCurrentUser() {
@@ -199,26 +215,30 @@ async function loadCurrentUser() {
         return;
     }
 
-    try {
+      try {
+
+        console.log("Reading document:", currentUserId);
 
         const userRef = doc(db, "users", currentUserId);
         const userSnap = await getDoc(userRef);
+
+        console.log("Exists:", userSnap.exists());
+        console.log("Data:", userSnap.data());
 
         if (!userSnap.exists()) {
             window.location.href = "createaccount.html";
             return;
         }
 
+
         currentUserProfile = userSnap.data();
 
     } catch (error) {
 
-        console.error("Failed to load user:", error);
-        alert("Unable to load your profile.");
-        return;
+    console.error(error);
+    alert(error.code + "\n\n" + error.message);
 
-    }
-
+}
 }
 
 await loadCurrentUser();
