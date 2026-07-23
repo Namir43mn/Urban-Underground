@@ -213,6 +213,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -226,25 +230,67 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+const auth = getAuth(app);
 
-        let uploadedPhotoBase64 = "";
+onAuthStateChanged(auth, (user) => {
+
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+});
+
+
+        let uploadedPhotoURL = "";
+const CLOUD_NAME = "z1vtvdmj";
+const UPLOAD_PRESET = "urbaun_chat";
         const photoInput = document.getElementById('photoInput');
         const imagePreview = document.getElementById('imagePreview');
         const previewPlaceholder = document.getElementById('previewPlaceholder');
+photoInput.addEventListener("change", async (e) => {
 
-        photoInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    uploadedPhotoBase64 = event.target.result;
-                    imagePreview.src = uploadedPhotoBase64;
-                    imagePreview.style.display = 'block';
-                    previewPlaceholder.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    previewPlaceholder.textContent = "Uploading...";
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+
+        const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            {
+                method: "POST",
+                body: formData
             }
-        });
+        );
+
+        const data = await response.json();
+
+        if (!data.secure_url) {
+            throw new Error("Cloudinary upload failed");
+        }
+
+        uploadedPhotoURL = data.secure_url;
+
+        imagePreview.src = uploadedPhotoURL;
+        imagePreview.style.display = "block";
+        previewPlaceholder.style.display = "none";
+
+} catch (error) {
+
+    console.error(error);
+    alert(error.message);
+
+    previewPlaceholder.textContent = "Click to upload photo";
+}
+
+});
 
         document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -252,27 +298,39 @@
             submitBtn.textContent = "SAVING TO CLOUD...";
             submitBtn.disabled = true;
 
+            const user = auth.currentUser;
+
+if (!user) {
+    alert("Please login first.");
+    window.location.href = "login.html";
+    return;
+}
+
             const versityId = document.getElementById('versityId').value.trim();
             const profileData = {
                 fullName: document.getElementById('fullName').value.trim(),
                 email: document.getElementById('email').value.trim(),
                 phone: document.getElementById('phone').value.trim(),
                 versityId: versityId,
-                photo: uploadedPhotoBase64 || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
+photo: uploadedPhotoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
             };
 
             try {
                 // Save profile to Cloud Firestore database
-                await setDoc(doc(db, "users", versityId), profileData);
+                await setDoc(doc(db, "users", user.uid), {
+    ...profileData,
+    uid: user.uid,
+    email: user.email
+});
                 // Save user ID to localStorage session
-                localStorage.setItem('ug_current_user_id', versityId);
+localStorage.setItem("ug_current_user_id", user.uid);
                 window.location.href = 'id.html';
             } 
             
             catch (error) {
     console.error("Firebase Error:", error);
     alert("Error: " + error.message);
-}
+
 
 
 submitBtn.textContent = "GENERATE ID CARD";

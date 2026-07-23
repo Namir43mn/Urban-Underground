@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <!-- Google Identity Services Library -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
 
   <style>
     :root {
@@ -244,22 +244,10 @@
     </div>
 
     <!-- Official Google Auth Setup -->
-    <div id="g_id_onload"
-         data-client_id="384287106499-eq2bp1e3esc50c82mvg6m2urjjjca3qs.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
-    </div>
 
-    <div class="google-btn-container">
-      <div class="g_id_signin"
-           data-type="standard"
-           data-size="large"
-           data-theme="dark"
-           data-text="continue_with"
-           data-shape="pill"
-           data-logo_alignment="left">
-      </div>
-    </div>
+    <button id="googleLoginBtn" class="btn-submit">
+    Continue with Google
+</button>
 
     <div class="register-prompt">
       Don't have a tag yet? <a href="createaccount.html">Create Account</a>
@@ -324,43 +312,54 @@
     animateParticles();
 
     // Standard Form Login Handler
-    const loginForm = document.getElementById('loginForm');
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('user-email').value;
-
-      localStorage.setItem('user_gmail', email);
-      localStorage.setItem('user_logged_in', 'true');
-      window.location.href = 'chat.html';
-    });
-
+ 
     // Google Sign-In Callback Handler
-    function handleCredentialResponse(response) {
-      // Decode JWT token payload to extract user details
-      const responsePayload = parseJwt(response.credential);
-
-      localStorage.setItem('user_gmail', responsePayload.email || 'google_user');
-      localStorage.setItem('user_name', responsePayload.name || 'Tagger');
-      localStorage.setItem('user_picture', responsePayload.picture || '');
-      localStorage.setItem('user_logged_in', 'true');
-
-      // Redirect to main chat room
-      window.location.href = 'chat.html';
-    }
 
     // Helper function to decode JWT Token
-    function parseJwt(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-      } catch (e) {
-        return {};
-      }
-    }
+    
   </script>
+<script type="module">
+  const googleLoginBtn = document.getElementById("googleLoginBtn");
+
+googleLoginBtn.addEventListener("click", async () => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        localStorage.setItem("ug_current_user_id", user.uid);
+
+        window.location.href = "createaccount.html";
+
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+    }
+});
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+    authDomain: "urbannoir-13ce8.firebaseapp.com",
+    projectId: "urbannoir-13ce8",
+    storageBucket: "urbannoir-13ce8.firebasestorage.app",
+    messagingSenderId: "1059246827383",
+    appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+    measurementId: "G-CEPWKZXQVF"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+</script>
+
+
 </body>
 </html>

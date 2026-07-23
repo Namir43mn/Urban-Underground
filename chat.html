@@ -189,69 +189,142 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const currentUserId = localStorage.getItem('ug_current_user_id');
-        let currentUserProfile = null;
+     const currentUserId = localStorage.getItem("ug_current_user_id");
+let currentUserProfile = null;
 
-        // Check login
-        if (!currentUserId) {
-            window.location.href = 'createaccount.html';
-        } else {
-            // Load user profile info
-            const userDoc = await getDoc(doc(db, "users", currentUserId));
-            if (userDoc.exists()) {
-                currentUserProfile = userDoc.data();
-            } else {
-                window.location.href = 'createaccount.html';
-            }
+async function loadCurrentUser() {
+
+    if (!currentUserId) {
+        window.location.href = "createaccount.html";
+        return;
+    }
+
+    try {
+
+        const userRef = doc(db, "users", currentUserId);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+            window.location.href = "createaccount.html";
+            return;
         }
+
+        currentUserProfile = userSnap.data();
+
+    } catch (error) {
+
+        console.error("Failed to load user:", error);
+        alert("Unable to load your profile.");
+        return;
+
+    }
+
+}
+
+await loadCurrentUser();
 
         const messagesList = document.getElementById('messagesList');
         const chatForm = document.getElementById('chatForm');
         const messageInput = document.getElementById('messageInput');
 
         // Listen for realtime live chat updates
-        const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
-        
-        onSnapshot(q, (snapshot) => {
-            messagesList.innerHTML = '';
-            snapshot.forEach((doc) => {
-                const msg = doc.data();
-                const isMine = msg.senderId === currentUserId;
+       function renderMessage(msg) {
 
-                const bubbleHtml = `
-                    <div class="message-bubble ${isMine ? 'mine' : ''}">
-                        <img src="${msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80'}" class="message-avatar">
-                        <div class="message-content">
-                            <div class="message-sender">${isMine ? 'You' : msg.senderName}</div>
-                            <div>${msg.text}</div>
-                        </div>
-                    </div>
-                `;
-                messagesList.insertAdjacentHTML('beforeend', bubbleHtml);
-            });
-            messagesList.scrollTop = messagesList.scrollHeight;
-        });
+    const isMine = msg.senderId === currentUserId;
+
+    return `
+        <div class="message-bubble ${isMine ? "mine" : ""}">
+
+            <img
+                class="message-avatar"
+                src="${msg.senderPhoto || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"}"
+                alt="Profile">
+
+            <div class="message-content">
+
+                <div class="message-sender">
+                    ${isMine ? "You" : (msg.senderName || "Unknown")}
+                </div>
+
+                <div>${msg.text || ""}</div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+const messagesQuery = query(
+    collection(db, "messages"),
+    orderBy("createdAt", "asc")
+);
+
+onSnapshot(messagesQuery, (snapshot) => {
+
+    messagesList.innerHTML = "";
+
+    snapshot.forEach((document) => {
+
+        const msg = document.data();
+
+        messagesList.insertAdjacentHTML(
+            "beforeend",
+            renderMessage(msg)
+        );
+
+    });
+
+    messagesList.scrollTop = messagesList.scrollHeight;
+
+}, (error) => {
+
+    console.error("Realtime listener error:", error);
+
+});
 
         // Send Message
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = messageInput.value.trim();
-            if (!text) return;
+        chatForm.addEventListener("submit", async (e) => {
 
-            messageInput.value = '';
+    e.preventDefault();
 
-            try {
-                await addDoc(collection(db, "messages"), {
-                    text: text,
-                    senderId: currentUserId,
-                    senderName: currentUserProfile.fullName,
-                    senderPhoto: currentUserProfile.photo,
-                    createdAt: serverTimestamp()
-                });
-            } catch (err) {
-                console.error("Error sending message:", err);
-            }
+    const text = messageInput.value.trim();
+
+    if (text.length === 0) return;
+
+    messageInput.disabled = true;
+
+    try {
+
+        await addDoc(collection(db, "messages"), {
+
+            text: text,
+
+            senderId: currentUserId,
+
+            senderName: currentUserProfile.fullName,
+
+            senderPhoto: currentUserProfile.photo,
+
+            createdAt: serverTimestamp()
+
         });
+
+        messageInput.value = "";
+        messageInput.focus();
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Failed to send message.");
+
+    } finally {
+
+        messageInput.disabled = false;
+
+    }
+
+});
     </script>
 </body>
 </html>
